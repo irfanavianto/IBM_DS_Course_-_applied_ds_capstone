@@ -46,7 +46,7 @@ app.layout = html.Div(
         html.Div(
             dcc.RangeSlider(
                 id='payload-slider', 
-                min=min_payload, max=max_payload, step=500,
+                min=min_payload, max=max_payload, step=1000,
                 marks={0: str(min_payload), 10000: str(max_payload)},
                 value=[min_payload, max_payload]
             )
@@ -80,7 +80,25 @@ def get_pie_chart(entered_site):
         return fig
 # TASK 4:
 # Add a callback function for `site-dropdown` and `payload-slider` as inputs, `success-payload-scatter-chart` as output
+@app.callback(
+	Output(component_id='success-payload-scatter-chart', component_property='figure'),
+	[ Input(component_id='site-dropdown', component_property='value'),
+  	  Input(component_id='payload-slider', component_property='value')]
+)
+def get_scatter_plot(input_site, mass_payload_slider):
+	min_weight, max_weight = mass_payload_slider
+	df_buffer = spacex_df.loc[
+		(spacex_df['Payload Mass (kg)'] >= min_weight) & 
+		(spacex_df['Payload Mass (kg)'] < max_weight)
+	]
+	if input_site.lower() != 'all':
+		df_buffer = df_buffer.loc[df_buffer['Launch Site'] == input_site]
 
+	fig = px.scatter(
+		df_buffer, x="Payload Mass (kg)", y="class",
+		color="Booster Version", size='Payload Mass (kg)',
+		hover_data=['Payload Mass (kg)'])
+	return fig
 
 # Run the app
 if __name__ == '__main__':
