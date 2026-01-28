@@ -1,5 +1,5 @@
 *.csv
 *backup*
 *.pptx
-*.pdf
+.pdf
 *.drawio*
